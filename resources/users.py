@@ -14,7 +14,7 @@ generic_fields = response.get_generic_response_fields()
 user_fields = {
     'id': fields.String,
     'created': fields.DateTime,
-    'updated': fields.DateTime,
+    'modified': fields.DateTime,
     'username': fields.String,
     'email': fields.String,
     'membership': fields.Integer(default=1)

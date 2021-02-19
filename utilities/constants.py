@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import datetime
 import os
+from models import User
 
 
 load_dotenv()
@@ -27,10 +28,10 @@ class Constant:
     
     def get_db_url(self, is_test=False):
         if is_test == True:
-            return os.getenv('SQL_URI')
+            return os.getenv('TEST_SQL_URI')
 
 
-        return os.getenv('TEST_SQL_URI')
+        return os.getenv('SQL_URI')
 
 
     def get_jwt_secret(self):
@@ -40,7 +41,7 @@ class Constant:
     def get_admin_credentials(self):
         return {
             'username': os.getenv('ADMIN_USERNAME'),
-            'password': os.getenv('ADMIN_PASSWORD'),
+            'password': User.generate_password(os.getenv('ADMIN_PASSWORD')),
             'email': os.getenv('ADMIN_EMAIL')
         }
 
