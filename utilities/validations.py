@@ -428,3 +428,135 @@ def validate_delete_card(f):
 
     
     return decorated
+
+
+def validate_get_comment(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        card_id = request.args.get('card_id')
+        id = request.args.get('id')
+        if card_id is None or card_id == "" or not generic_uuid4_validator(card_id):
+            response['message'] = 'card id is required'
+            return response, 400
+
+
+        if id is not None and (id == "" or not generic_uuid4_validator(id)):
+            response['message'] = 'id is required'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_post_comment(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        schema = {
+            'card_id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 64, 
+                'validator': uuid4_validator
+            },
+            'reply_to': {
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+                'required': True,
+                'maxlength': 64, 
+                'validator': uuid4_validator
+            },
+            'content': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 512
+            }
+        }
+
+        data = request.get_json()
+        if data is None or data == {}:
+            response['message'] = 'JSON body is required'
+            return response, 400
+
+        v = Validator(schema)
+        try:
+            if not v.validate(data):
+                response['message'] = f'error: {v.errors}'
+                return response, 400
+        except:
+            response['message'] = f'error: {v.errors}'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_put_comment(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        schema = {
+            'id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 64, 
+                'validator': uuid4_validator
+            },
+            'content': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 512
+            }
+        }
+
+        data = request.get_json()
+        if data is None or data == {}:
+            response['message'] = 'JSON body is required'
+            return response, 400
+
+        v = Validator(schema)
+        try:
+            if not v.validate(data):
+                response['message'] = f'error: {v.errors}'
+                return response, 400
+        except:
+            response['message'] = f'error: {v.errors}'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_delete_comment(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        id = request.args.get('id')
+        if id is None or id == "" or not generic_uuid4_validator(id):
+            response['message'] = 'id is required'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated

@@ -74,17 +74,8 @@ class Comment(Base, db.Model):
 
     content = db.Column(db.String(512), nullable=False)
     card_id = db.Column(UUID(as_uuid=True), db.ForeignKey('cards.id'), nullable=False)
-    replies = db.relationship('Reply', backref='comments', lazy='dynamic')
+    reply_to = db.Column(UUID(as_uuid=True), db.ForeignKey('comments.id'), nullable=True)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
-
-
-class Reply(Base, db.Model):
-    __tablename__ = 'replies'
-
-
-    content = db.Column(db.String(512), nullable=False)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
-    comment_id = db.Column(UUID(as_uuid=True), db.ForeignKey('comments.id'), nullable=False)
 
 
 class Token(Base, db.Model):
