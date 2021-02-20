@@ -1,0 +1,65 @@
+name: Unit Test
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # service container to run with container job
+    services:
+      # label to access the service container
+      postgres:
+        # docker hub image
+        image: postgres
+        # provide password for posgres
+        env:
+          POSTGRES_DB: db_name_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        # set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+    - name: Set up Python 3.8.5
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.5
+    
+    # Writing secrects into .env 
+    - name: Copy test env
+      run: 'echo -e "${{secrets.TEST_ENV}}" > .env'
+
+    # Caching dependencies
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+            
+    # Installing dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    # Error checking, ignoring design errors
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 . --ignore E501,E265,E302,W293,E722,E231,E122,W291,E303,E261,E211,E301,E123,E305,E126,E221,F401,E402,W292,C901,E712 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Run tests
+      run: python -m unittest discover -s tests
