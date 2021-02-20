@@ -8,11 +8,6 @@ from uuid import uuid4
 
 
 db = SQLAlchemy()
-list_memberships = db.Table(
-    'list_memberships',
-    db.Column('user_id', UUID(as_uuid=True), db.ForeignKey('users.id'), primary_key=True),
-    db.Column('list_id', UUID(as_uuid=True), db.ForeignKey('lists.id'), primary_key=True)
-)
 
 
 class Base(object):
@@ -58,9 +53,8 @@ class List(Base, db.Model):
 
 
     title = db.Column(db.String(256), nullable=False)
-    cards = db.relationship('Card', backref='lists', lazy='dynamic')
+    cards = db.relationship('Card', backref='lists', lazy=True)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=True)
-    memberships = db.relationship('User', secondary=list_memberships, lazy='dynamic', backref=db.backref('listss', lazy='dynamic'))
 
 
 class Card(Base, db.Model):

@@ -97,6 +97,6 @@ class Auth(Resource):
         db.session.delete(curr_token)
         db.session.commit()
         resp['message'] = 'successfully revoked a token'
-        return resp, 401
+        return resp, 200
 
 

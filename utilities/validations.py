@@ -156,7 +156,6 @@ def validate_delete_auth(f):
     return decorated
 
 
-
 def is_admin(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -166,6 +165,113 @@ def is_admin(f):
                 'status': 'error',
                 'message': 'Not authorized to access this endpoint'
             }, 401
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_post_list(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        schema = {
+            'title': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 256
+            },
+            'user_id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+                'required': False,
+                'maxlength': 256
+            }
+        }
+
+        data = request.get_json()
+        if data is None or data == {}:
+            response['message'] = 'JSON body is required'
+            return response, 400
+
+        v = Validator(schema)
+        try:
+            if not v.validate(data):
+                response['message'] = f'error: {v.errors}'
+                return response, 400
+        except:
+            response['message'] = f'error: {v.errors}'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_put_list(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        schema = {
+            'id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 64
+            },
+            'title': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 256
+            },
+            'user_id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': True,
+                'required': False,
+                'maxlength': 256
+            }
+        }
+
+        data = request.get_json()
+        if data is None or data == {}:
+            response['message'] = 'JSON body is required'
+            return response, 400
+
+        v = Validator(schema)
+        try:
+            if not v.validate(data):
+                response['message'] = f'error: {v.errors}'
+                return response, 400
+        except:
+            response['message'] = f'error: {v.errors}'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_delete_list(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        id = request.args.get('id')
+        if id is None or id == "":
+            response['message'] = 'id is required'
+            return response, 400
+
             
         return f(*args, **kwargs)
 
