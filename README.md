@@ -25,7 +25,7 @@ A simple service that runs in Python with Flask framework and using PostgreSQL. 
 - Run the Application
   - `python run.py`
 - Run the Test Cases
-  - `python -m unittest tests/test.py -b`
+  - `python -m unittest discover -s tests`
 
 
 ## API Enpoints
