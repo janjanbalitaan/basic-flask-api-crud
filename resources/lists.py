@@ -59,12 +59,17 @@ class Lists(Resource):
 
 
         lists = lists.limit(limit).offset(offset).all()
-        print(lists[0])
-        lists = [lst.to_dict() for lst in lists]
+        lists_data = []
+        for lst in lists:
+            l = lst.to_dict()
+            l['cards'] = [c.to_dict() for c in lst.cards]
+            lists_data.append(l)
+
+
         return {
             'status': 'ok',
             'message': 'Successfully fetched the lists',
-            'data': lists
+            'data': lists_data
         }, 200
 
 
@@ -95,6 +100,7 @@ class Lists(Resource):
     @validate_put_list
     @jwt_required()
     @is_admin
+    @marshal_with(generic_fields)
     def put(self):
         current_user = json.loads(get_jwt_identity())
         data = request.get_json()
@@ -130,20 +136,22 @@ class Lists(Resource):
     @validate_delete_list
     @jwt_required()
     @is_admin
+    @marshal_with(generic_fields)
     def delete(self):
+        r = resp.copy()
         current_user = json.loads(get_jwt_identity())
         id = request.args.get('id')
         curr_list = List.query.filter(List.id==id).first()
 
 
         if curr_list is None:
-            resp['status'] = 'error'
-            resp['message'] = 'list is not found on the database'
-            return resp, 403
+            r['status'] = 'error'
+            r['message'] = 'list is not found on the database'
+            return r, 403
 
 
         db.session.delete(curr_list)
         db.session.commit()
-        resp['message'] = 'successfully deleted a list'
-        return resp, 200
+        r['message'] = 'successfully deleted a list'
+        return r, 200
 

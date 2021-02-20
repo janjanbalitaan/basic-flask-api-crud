@@ -3,6 +3,7 @@ from cerberus import Validator
 from functools import wraps
 from flask_jwt_extended import get_jwt_identity
 import json
+from uuid import uuid4, UUID
 from utilities.constants import Constant
 
 
@@ -11,6 +12,20 @@ response = {
     'message': 'error'
 }
 constants = Constant.get_instance()
+
+
+def generic_uuid4_validator(str):
+    try:
+        val = UUID(str, version=4)
+        return True
+    except:
+        return False
+
+
+def uuid4_validator(field, value, error):
+    if value is not None and value != "":
+        if not generic_uuid4_validator(value):
+            error(field, "Must be in a valid format of uuidv4")
 
 
 def validate_user_create(f):
@@ -102,7 +117,8 @@ def validate_post_auth(f):
                     'empty': False,
                     'nullable': False,
                     'required': True,
-                    'maxlength': 64
+                    'maxlength': 64, 
+                    'validator': uuid4_validator
                 },
                 'grant_type': grant_type_schema
             }
@@ -145,7 +161,7 @@ def validate_delete_auth(f):
     def decorated(*args, **kwargs):
 
         refresh_token = request.args.get('refresh_token')
-        if refresh_token is None or refresh_token == "":
+        if refresh_token is None or refresh_token == "" or not generic_uuid4_validator(refresh_token):
             response['message'] = 'refresh_token is required'
             return response, 400
 
@@ -189,7 +205,8 @@ def validate_post_list(f):
                 'empty': False,
                 'nullable': True,
                 'required': False,
-                'maxlength': 256
+                'maxlength': 64, 
+                'validator': uuid4_validator
             }
         }
 
@@ -224,7 +241,8 @@ def validate_put_list(f):
                 'empty': False,
                 'nullable': False,
                 'required': True,
-                'maxlength': 64
+                'maxlength': 64, 
+                'validator': uuid4_validator
             },
             'title': {
                 'type': 'string',
@@ -238,7 +256,8 @@ def validate_put_list(f):
                 'empty': False,
                 'nullable': True,
                 'required': False,
-                'maxlength': 256
+                'maxlength': 64, 
+                'validator': uuid4_validator
             }
         }
 
@@ -268,7 +287,139 @@ def validate_delete_list(f):
     def decorated(*args, **kwargs):
 
         id = request.args.get('id')
-        if id is None or id == "":
+        if id is None or id == "" or not generic_uuid4_validator(id):
+            response['message'] = 'id is required'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_get_card(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        list_id = request.args.get('list_id')
+        if list_id is None or list_id == "" or not generic_uuid4_validator(list_id):
+            response['message'] = 'list id is required'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_post_card(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        schema = {
+            'list_id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 64, 
+                'validator': uuid4_validator
+            },
+            'title': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 256
+            },
+            'description': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 512
+            }
+        }
+
+        data = request.get_json()
+        if data is None or data == {}:
+            response['message'] = 'JSON body is required'
+            return response, 400
+
+        v = Validator(schema)
+        try:
+            if not v.validate(data):
+                response['message'] = f'error: {v.errors}'
+                return response, 400
+        except:
+            response['message'] = f'error: {v.errors}'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_put_card(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+    
+        schema = {
+            'id': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 64, 
+                'validator': uuid4_validator
+            },
+            'title': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 256
+            },
+            'description': {
+                'type': 'string',
+                'empty': False,
+                'nullable': False,
+                'required': True,
+                'maxlength': 512
+            }
+        }
+
+        data = request.get_json()
+        if data is None or data == {}:
+            response['message'] = 'JSON body is required'
+            return response, 400
+
+        v = Validator(schema)
+        try:
+            if not v.validate(data):
+                response['message'] = f'error: {v.errors}'
+                return response, 400
+        except:
+            response['message'] = f'error: {v.errors}'
+            return response, 400
+
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+def validate_delete_card(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        id = request.args.get('id')
+        if id is None or id == "" or not generic_uuid4_validator(id):
             response['message'] = 'id is required'
             return response, 400
 

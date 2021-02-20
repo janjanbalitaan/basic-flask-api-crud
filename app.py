@@ -3,6 +3,7 @@ from flask_restful import Api
 from resources.users import Users
 from resources.auth import Auth
 from resources.lists import Lists
+from resources.cards import Cards
 
 
 # initializations
@@ -14,3 +15,4 @@ api = Api(api_bp)
 api.add_resource(Users, '/users')
 api.add_resource(Auth, '/auth/token')
 api.add_resource(Lists, '/lists')
+api.add_resource(Cards, '/cards')

@@ -53,7 +53,7 @@ class List(Base, db.Model):
 
 
     title = db.Column(db.String(256), nullable=False)
-    cards = db.relationship('Card', backref='lists', lazy=True)
+    cards = db.relationship('Card', backref='lists', lazy='subquery')
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=True)
 
 
