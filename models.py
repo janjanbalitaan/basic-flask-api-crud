@@ -54,7 +54,7 @@ class List(Base, db.Model):
 
     title = db.Column(db.String(256), nullable=False)
     cards = db.relationship('Card', backref='lists', lazy='subquery')
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=True)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
 
 
 class Card(Base, db.Model):
@@ -63,9 +63,9 @@ class Card(Base, db.Model):
 
     title = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(512), nullable=True)
-    list_id = db.Column(UUID(as_uuid=True), db.ForeignKey('lists.id'), nullable=False)
+    list_id = db.Column(UUID(as_uuid=True), db.ForeignKey('lists.id', ondelete='CASCADE'), nullable=False)
     comments = db.relationship('Comment', backref='cards', lazy='dynamic')
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=True)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
 
 
 class Comment(Base, db.Model):
@@ -73,13 +73,13 @@ class Comment(Base, db.Model):
 
 
     content = db.Column(db.String(512), nullable=False)
-    card_id = db.Column(UUID(as_uuid=True), db.ForeignKey('cards.id'), nullable=False)
-    reply_to = db.Column(UUID(as_uuid=True), db.ForeignKey('comments.id'), nullable=True)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    card_id = db.Column(UUID(as_uuid=True), db.ForeignKey('cards.id', ondelete='CASCADE'), nullable=False)
+    reply_to = db.Column(UUID(as_uuid=True), db.ForeignKey('comments.id', ondelete='CASCADE'), nullable=True)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
 
 class Token(Base, db.Model):
     __tablename__ = 'tokens'
 
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     expiration = db.Column(db.DateTime, nullable=False, default=datetime.now() + timedelta(days=30))
