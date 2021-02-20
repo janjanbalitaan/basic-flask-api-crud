@@ -2,7 +2,6 @@ from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
 from flask_restful import Resource, fields, marshal_with, marshal
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import User
 from utilities.response import Response
 from utilities.validations import validate_user_create, is_admin
 from models import db, User
@@ -32,14 +31,6 @@ class Users(Resource):
     @is_admin
     @marshal_with(users_list)
     def get(self):
-        current_user = json.loads(get_jwt_identity())
-        if current_user["membership_type"] != 0:
-            return {
-                'status': 'error',
-                'message': 'Not authorized to access this endpoint'
-            }, 401
-
-
         limit = request.args.get('limit', 30)
         offset = request.args.get('offset', 0)
         users = User.query.limit(limit).offset(offset).all()
