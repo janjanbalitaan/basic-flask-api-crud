@@ -46,5 +46,13 @@ class Constant:
         }
 
     
+    def get_admin_credentials_for_test(self):
+        return {
+            'username': os.getenv('ADMIN_USERNAME'),
+            'password': os.getenv('ADMIN_PASSWORD'),
+            'email': os.getenv('ADMIN_EMAIL')
+        }
+
+    
     def get_supported_grant_types(self):
         return ['password', 'refresh_token']
