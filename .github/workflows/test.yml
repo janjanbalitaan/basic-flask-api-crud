@@ -31,6 +31,7 @@ jobs:
           - 5432:5432
 
     steps:
+    - uses: actions/checkout@v2
     - name: Set up Python 3.8.5
       uses: actions/setup-python@v2
       with:
@@ -62,5 +63,6 @@ jobs:
       run: |
         pip install flake8
         flake8 . --ignore E501,E265,E302,W293,E722,E231,E122,W291,E303,E261,E211,E301,E123,E305,E126,E221,F401,E402,W292,C901,E712 --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
     - name: Run tests
-      run: python -m unittest discover -s tests
+      run: python -m unittest tests/test.py -b
