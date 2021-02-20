@@ -4,7 +4,7 @@ from flask_restful import Resource, fields, marshal_with, marshal
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import User
 from utilities.response import Response
-from utilities.validations import validate_user_create
+from utilities.validations import validate_user_create, is_admin
 from models import db, User
 import json
 
@@ -29,6 +29,7 @@ user_resp['data'] = user_fields
 class Users(Resource):
 
     @jwt_required()
+    @is_admin
     @marshal_with(users_list)
     def get(self):
         current_user = json.loads(get_jwt_identity())

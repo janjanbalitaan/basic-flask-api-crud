@@ -33,7 +33,7 @@ def create_app(config):
 
 
     @jwt.expired_token_loader
-    def expired_token_callback(callback):
+    def expired_token_callback(self, callback):
         return {
             'status': 'error',
             'message': 'The bearer token has already expired. Please try to login again.'
@@ -49,18 +49,10 @@ def create_app(config):
 
 
     @jwt.needs_fresh_token_loader
-    def fresh_token_callback(callback):
+    def fresh_token_callback(self, callback):
         return {
             'status': 'error',
             'message': 'The request authorization has invalid bearer token'
-        }, 401
-
-
-    @jwt.needs_fresh_token_loader
-    def fresh_token_callback(callback):
-        return {
-            'status': 'error',
-            'message': 'The bearer token has been revoked. Please try to login again.'
         }, 401
 
 

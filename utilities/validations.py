@@ -1,6 +1,8 @@
 from flask import request
 from cerberus import Validator
 from functools import wraps
+from flask_jwt_extended import get_jwt_identity
+import json
 from utilities.constants import Constant
 
 
@@ -147,6 +149,23 @@ def validate_delete_auth(f):
             response['message'] = 'refresh_token is required'
             return response, 400
 
+            
+        return f(*args, **kwargs)
+
+    
+    return decorated
+
+
+
+def is_admin(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        current_user = json.loads(get_jwt_identity())
+        if current_user["membership_type"] != 0:
+            return {
+                'status': 'error',
+                'message': 'Not authorized to access this endpoint'
+            }, 401
             
         return f(*args, **kwargs)
 
