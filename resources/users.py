@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from sqlalchemy.exc import IntegrityError
-from flask_restful import Resource, fields, marshal_with, marshal
+from flask_restful import Resource, fields, marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from utilities.response import Response
 from utilities.validations import validate_user_create, is_admin
@@ -47,7 +47,7 @@ class Users(Resource):
     def post(self):
         resp = {
             "status": "ok",
-            "message": "Successfully created the users",
+            "message": "Successfully created the user",
         }
         data = request.get_json()
         password = User.generate_password(data['password'])
@@ -55,14 +55,12 @@ class Users(Resource):
             user = User(username=data['username'], password=password, email=data['email'])
             db.session.add(user)    
             db.session.commit()
-            resp['data'] = user
         except IntegrityError:
             db.session.rollback()
             resp['status'] = 'error'
             resp['message'] = "Username or Email is already taken"
             return resp, 409
         
-        print(resp)
 
-        return marshal(resp, user_resp), 200
+        return resp, 200
 
